@@ -1,0 +1,603 @@
+const Discord = require('discord.js');
+const { normalize } = require('path');
+const client = new Discord.Client
+const ytdl = require('ytdl-core');
+const prefix =  '~';
+const channelTypes = {
+	dm: 'DM',
+	group: 'Group DM',
+	text: 'Text Channel',
+	voice: 'Voice Channel',
+	category: 'Category',
+	unknown: 'Unknown'
+}
+//  _____   _    _   __     __   __     __   _   ______    ______   _______ 
+// |  _  \ | |  | | |  \   /  | |  \   /  | |_| |  __  \  /  __  \ |__   __|
+// | | | | | |  | | | | \_/ | | | | \_/ | |  _  | |__|  | | |  | |    | |   
+// | | | | | |  | | | |\___/| | | |\___/| | | | |  __  /  | |  | |    | |   
+// | | | | | |  | | | |     | | | |     | | | | | |  \  \ | |  | |    | |   
+// | |_| | | |__| | | |     | | | |     | | | | | |__/  / | |__| |    | |    
+// |_____/ \______/ |_|     |_| |_|     |_| |_| |______/  \______/    |_|   
+
+var voices = new Map();
+function capitalize(name) {
+	name = name.toLowerCase();
+	return name.charAt(0).toUpperCase() + name.slice(1)
+}
+function sleep(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms));
+}
+function getUptime() {
+	let totalSeconds = (client.uptime / 1000);
+	let days = Math.floor(totalSeconds / 86400);
+	totalSeconds %= 86400;
+	let hours = Math.floor(totalSeconds / 3600);
+	totalSeconds %= 3600;
+	let minutes = Math.floor(totalSeconds / 60);
+	let seconds = Math.floor(totalSeconds % 60);
+	let uptime = `${days} days, ${hours} hours, ${minutes} minutes and ${seconds} seconds`;
+	let noSecUptime = `${days} days, ${hours} hours and ${minutes} minutes`;
+	return {uptime: uptime, noSecUptime: noSecUptime};
+}
+
+function validURL(str) {
+	var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+	'((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+	'((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+	'(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+	'(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+	'(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+	return !!pattern.test(str);
+}
+
+
+
+client.on('ready', async message => {
+	console.log(`Logged in as ${client.user.tag}, in ${client.guilds.cache.array().length} servers`)
+	const channel = client.channels.cache.get('770356118710517791'); 
+	messages = await channel.messages.fetch()
+	messages.forEach(async e => {
+		await e.delete()
+	})
+	var embed = new Discord.MessageEmbed()
+	.setDescription(`**<@${client.user.id}> is online!**`)
+	.addField(`Servers it signed in to:`, `${client.guilds.cache.array().length}`, true)
+	.setColor(0xb000ff)
+	.setImage('https://dslv9ilpbe7p1.cloudfront.net/CKmk364xaI28ZM7c6qsP4Q_store_header_image')
+	await channel.send(embed).catch(e => console.log(e));
+	uptime = getUptime().noSecUptime;
+
+	let m = await channel.send(`Currently been online for ${uptime} since my last restart\n\nIf you don't see this message update every minute it means I'm offline!`).catch(e => console.log(e));
+	setInterval(async function(){
+		uptime = getUptime().noSecUptime;
+		await m.edit(`Currently been online for ${uptime} since my last restart. \n\nIf you don't see this message update every minute it means I'm offline!`);
+	}, 60000)
+	
+	
+})
+
+client.on('message', async message => {
+	if(!message.content.startsWith(prefix) || message.author.bot) return;
+	let args = message.content.slice(prefix.length).split(/ +/);
+	const command = args.shift().toLowerCase();
+	
+	if (command == 'info') {
+		uptime = getUptime().uptime;
+		let m = await message.channel.send('calculating...')
+		await m.edit('calculated!')
+		var embed = new Discord.MessageEmbed()
+		.setTitle(`Bot Info:`)
+		.setDescription(`Bot maker: @𝒯𝒽𝑒__𝒟𝓊𝓂𝓂𝒾#6470 \nLatency is: ${m.createdTimestamp - message.createdTimestamp} ms. \nNumber of servers the bot is in: ${client.guilds.cache.array().length}.\nUptime: ${uptime}`)
+		.setColor(0xb000ff) 
+		await message.channel.send(embed);
+		
+	} else if (command == 'embed') {
+		parts = message.cleanContent.replace(`${prefix}${command} `, "").split("/")
+		if (!parts[0] || !parts[1]) return message.reply("You must give a title and description, seperate fields with `/`.")
+		var embed = new Discord.MessageEmbed()
+		.setTitle(parts[0])
+		.setDescription(parts[1])
+		.setColor(0xb000ff)
+		await message.channel.send(embed); 
+		
+	} else if (command == 'ping') {
+		await message.reply(__dirname)
+		var m = await message.channel.send(`pinging...`)
+		m.edit(`pinged! \nBot latency: ${m.createdTimestamp - message.createdTimestamp}ms.`)
+		
+	} else if (command == 'money') {
+		var m = await message.channel.send(`<@${message.author.id}> do you want free money? click the emote below!`)
+		await m.react(client.emojis.cache.get('726935952584605737'))
+		const filter = (reaction, user) => reaction.emoji.id == 726935952584605737 && user.id == message.author.id
+		m.awaitReactions(filter, { max: 1 })
+  			.then(async collected => {
+				await m.edit(`Virus uploading...    \n(....................) 0%   `)
+				await sleep(750)
+				await m.edit(`Virus uploading.      \n(:...................) 5%   `)
+				await sleep(750)
+				await m.edit(`Virus uploading..     \n(::..................) 10%  `)
+				await sleep(750)
+				await m.edit(`Virus uploading...    \n(:::.................) 15%  `)
+				await sleep(750)
+				await m.edit(`Virus uploading.      \n(::::................) 20%  `)
+				await sleep(750)
+				await m.edit(`Virus uploading..     \n(:::::...............) 25%  `)
+				await sleep(750)
+				await m.edit(`Virus uploading...    \n(::::::..............) 30%  `)
+				await sleep(750)
+				await m.edit(`Virus uploading.      \n(:::::::.............) 35%  `)
+				await sleep(750)
+				await m.edit(`Virus uploading..     \n(::::::::............) 40%  `)
+				await sleep(750)
+				await m.edit(`Virus uploading...    \n(:::::::::...........) 45%  `)
+				await sleep(750)
+				await m.edit(`Virus uploading.      \n(::::::::::..........) 50%  `)
+				await sleep(750)
+				await m.edit(`Virus uploading..     \n(:::::::::::.........) 55%  `)
+				await sleep(750)
+				await m.edit(`Virus uploading...    \n(::::::::::::........) 60%  `)
+				await sleep(750)
+				await m.edit(`Virus uploading..     \n(:::::::::::::.......) 65%  `)
+				await sleep(750)
+				await m.edit(`Virus uploading...    \n(::::::::::::::......) 70%  `)
+				await sleep(750)
+				await m.edit(`Virus uploading.      \n(:::::::::::::::.....) 75%  `)
+				await sleep(750)
+				await m.edit(`Virus uploading..     \n(::::::::::::::::....) 80%  `)
+				await sleep(750)
+				await m.edit(`Virus uploading...    \n(:::::::::::::::::...) 85%  `)
+				await sleep(750)
+				await m.edit(`Virus uploading.      \n(::::::::::::::::::..) 90%  `) 
+				await sleep(750)
+				await m.edit(`Virus uploading..     \n(:::::::::::::::::::.) 95%  `)
+				await sleep(750)
+				await m.edit(`Virus uploading...    \n(::::::::::::::::::::) 100% `)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nInitiating download...`)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading.  \n(....................) 0%  `)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading.. \n(:...................) 5%  `)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading...\n(::..................) 10% `)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading.  \n(:::.................) 15% `)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading.. \n(::::................) 20% `)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading...\n(:::::...............) 25% `)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading.  \n(::::::..............) 30% `)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading.. \n(:::::::.............) 35% `)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading...\n(::::::::............) 40% `)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading.  \n(:::::::::...........) 45% `)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading...\n(::::::::::..........) 50% `)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading.  \n(:::::::::::.........) 55% `)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading.. \n(::::::::::::........) 60% `)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading...\n(:::::::::::::.......) 65% `)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading.  \n(::::::::::::::......) 70% `)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading.. \n(:::::::::::::::.....) 75% `)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading...\n(::::::::::::::::....) 80% `)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading.  \n(:::::::::::::::::...) 85% `)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading.. \n(::::::::::::::::::..) 90% `)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading...\n(:::::::::::::::::::.) 95% `)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading.  \n(::::::::::::::::::::) 100% `)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading done!\n(::::::::::::::::::::) 100% \nInitiating install...`)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading done!\n(::::::::::::::::::::) 100% \nInstalling.  \n(..................) 0%`)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading done!\n(::::::::::::::::::::) 100% \nInstalling.. \n(:.................) 5%`)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading done!\n(::::::::::::::::::::) 100% \nInstalling...\n(::................) 10%`)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading done!\n(::::::::::::::::::::) 100% \nInstalling.  \n(:::...............) 15%`)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading done!\n(::::::::::::::::::::) 100% \nInstalling.. \n(::::..............) 20%`)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading done!\n(::::::::::::::::::::) 100% \nInstalling...\n(:::::.............) 25%`)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading done!\n(::::::::::::::::::::) 100% \nInstalling.  \n(::::::............) 30%`)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading done!\n(::::::::::::::::::::) 100% \nInstalling.. \n(:::::::...........) 35%`)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading done!\n(::::::::::::::::::::) 100% \nInstalling...\n(::::::::..........) 40%`)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading done!\n(::::::::::::::::::::) 100% \nInstalling.  \n(:::::::::.........) 55%`)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading done!\n(::::::::::::::::::::) 100% \nInstalling.. \n(::::::::::........) 60%`)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading done!\n(::::::::::::::::::::) 100% \nInstalling...\n(:::::::::::.......) 65%`)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading done!\n(::::::::::::::::::::) 100% \nInstalling.  \n(::::::::::::......) 70%`)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading done!\n(::::::::::::::::::::) 100% \nInstalling.. \n(:::::::::::::.....) 75%`)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading done!\n(::::::::::::::::::::) 100% \nInstalling...\n(::::::::::::::....) 80%`)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading done!\n(::::::::::::::::::::) 100% \nInstalling.  \n(:::::::::::::::...) 85%`)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading done!\n(::::::::::::::::::::) 100% \nInstalling.. \n(::::::::::::::::..) 90%`)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading done!\n(::::::::::::::::::::) 100% \nInstalling...\n(:::::::::::::::::.) 95%`)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading done!\n(::::::::::::::::::::) 100% \nInstalling.  \n(::::::::::::::::::) 100%`)
+				await sleep(750)
+				await m.edit(`Virus upload done! \n(::::::::::::::::::::) 100% \nDownloading done!\n(::::::::::::::::::::) 100% \nVirus installed! \n(::::::::::::::::::) 100% \nYou <@${message.author.id}> dummi! You got your discord infected! Now that your discord got infected pay me to get it removed!`)
+			})
+  			.catch(console.error);
+		
+	} else if(command == 'realname') { 
+
+		await message.channel.send('```\n  _____   _    _   __     __   __     __   _   ______    ______   _______ \n |  _  \\ | |  | | |  \\   /  | |  \\   /  | |_| |  __  \\  /  __  \\ |__   __|\n | | | | | |  | | | | \\_/ | | | | \\_/ | |  _  | |__|  | | |  | |    | |   \n | | | | | |  | | | |\\___/| | | |\\___/| | | | |  __  /  | |  | |    | |   \n | | | | | |  | | | |     | | | |     | | | | | |  \\  \\ | |  | |    | |   \n | |_| | | |__| | | |     | | | |     | | | | | |__/  / | |__| |    | |   \n |_____/ \\______/ |_|     |_| |_|     |_| |_| |______/  \\______/    |_|    ```')
+	
+	} else if(command == 'rolldice') { 
+		const rollDice = () => {
+			roll = Math.floor(Math.random() * 6) + 1;
+			switch (roll) {
+				case 1:
+					return ":one:";
+					break;
+				case 2:
+					return ":two:";
+					break;
+				case 3:
+					return ":three:";
+					break;
+				case 4:
+					return ":four:";
+					break;
+				case 5:
+					return ":five:";
+					break;
+				case 6:
+					return ":six:";
+					break;
+			}
+		}
+		if (!args[0]) {
+			return await message.reply("You must give a number of dice!")
+		}
+		if (Number(args[0]) > 100 || Number(args[0]) < 1) {
+			return await message.reply("Number must be between 1 and 100!")
+		}
+		var m = await message.channel.send(`rolling ${args[0]} dice...`);
+		await sleep(2000)
+		var str = "Rolls:\n";
+		for (var i = 0; i < Number(args[0]); i++) {
+			str = str + (i+1) + ": " + rollDice() + "\n"
+		}
+		m.edit(`${str}`);	
+	} else if(command == 'hello') {
+		var embed = new Discord.MessageEmbed()
+		.setDescription(`hello there, general <@${message.author.id}>`)
+		.setImage('https://media1.tenor.com/images/b93a212c42e0630c534d90c386b221f3/tenor.gif?itemid=16358959')
+		.setColor(0xb000ff)
+		await message.channel.send(embed);
+			
+	} else if(command == 'rip') {
+		var embed = new Discord.MessageEmbed()
+		.setDescription(`<@${message.author.id}> says rest in pieces...`)
+		.setImage('https://media1.tenor.com/images/32ebf4ce9d93bce4b14dee893c26ce06/tenor.gif?itemid=16743302')
+		.setColor(0xb000ff)
+		await message.channel.send(embed);
+		
+	} else if (command == 'help'){
+		var embed = new Discord.MessageEmbed()
+		.setTitle('Help menu:')
+		.setColor(0xb000ff)
+		.setDescription(`Open command list with ~commands. \nJoin the support server for help with ~link.`);
+		await message.channel.send(embed);
+		
+	} else if (command == 'commands') {
+		var embed = new Discord.MessageEmbed()
+		.setColor(0xb000ff)
+		.setThumbnail(message.guild.iconURL())
+		.addField('| Admin commands:', `~ping: get bot latency. \n~prefix: coming soon`, true)
+		.addField(`| General commands:`, `~help: get the help message. \n~commands: get this menu. \n~emotes: get a list of all custom server emotes! `, true)
+		.addField(`| Info commands:`,`~serverinfo: get info about ${message.guild.name} server \n~userinfo: get info about you.\n~av: show your profile picture. \n~channelinfo: get info about ${message.channel.name}. \n~roleinfo [role]: get info about mentioned role. \n~info: get info about the bot.`, true)
+		.addField(`| Music commands:`, `~play [URL]: play song. \n~pause: coming soon. \n~skip: coming soon. \n~clear: coming soon. \~volume: coming soon.`, true)
+		.addField(`| Fun commands:`, `~hello: say hello in style. \n~yeet [user]: yeet someone! \n~kill [user]: kill someone! \n~rip: pay respect.`, true)
+		.addField(`| Minigame commands:`,`~rolldice: roll a dice \n~roll5dice: roll 5 dices \n~rps: challenge the bot to a game of rock, paper or scissors \n~flipcoin: flip a coin\n~bubbleplastic: pop bubbleplastic!` , true)
+		.addField(`| Support commands:`,`~invite: bot invite link  \n ~link: support server for DummiBot \n~servers: All 𝒯𝒽𝑒__𝒟𝓊𝓂𝓂𝒾#6470 owned server's links` , true)
+		await message.channel.send(embed);
+		
+		
+	} else if (command == 'invite') {
+		var embed = new Discord.MessageEmbed()
+		.setTitle(`Invite bot here:`)
+		.setDescription(`https://discord.com/oauth2/authorize?client_id=741940149633679390&scope=bot&permissions=8`)
+		.setColor(0xb000ff)
+		await message.channel.send(embed);
+		
+	} else if (command == 'link') {
+		var embed = new Discord.MessageEmbed()
+		.setTitle('Support server link:')
+		.setDescription('https://discord.gg/AJxtuxg')
+		.setColor(0xb000ff)
+		await message.channel.send(embed);
+		
+	} else if (command == 'yeet') {
+		var embed = new Discord.MessageEmbed()
+		.setTitle('YA YEEET!!!')
+		.setDescription(`<@${message.author.id}> Yeeted ${args[0]}!!`)
+		.setImage('https://media1.tenor.com/images/b7cded2e6c866a147425f525eeb1e56e/tenor.gif?itemid=12559094')
+		.setColor(0xb000ff)
+		await message.channel.send(embed);
+		
+	} else if (command == 'kill') {
+		var embed = new Discord.MessageEmbed()
+		.setTitle('BAM')
+		.setDescription(`<@${message.author.id}> shot ${args[0]}!!`)
+		.setImage('https://media1.tenor.com/images/66eb6a312af9a99be2b42bf45c0068c7/tenor.gif?itemid=17982088')
+		.setColor(0xb000ff)
+		await message.channel.send(embed);
+		
+	} else if (command == 'av') {
+		var url
+		if (message.mentions.users.array()[0] === undefined) {
+			url = message.author.displayAvatarURL()
+		}
+		else {
+			url = message.mentions.users.array()[0].displayAvatarURL()
+		}
+		var embed = new Discord.MessageEmbed()
+		.setDescription(`${args[0] || message.author.tag}'s avatar:`)
+		.setColor(0xb000ff)
+		.setURL(url)
+		.setImage(url);
+		await message.channel.send(embed);
+		
+	} else if (command == 'play') {
+		if (!message.member.voice.channel) {
+			return message.reply("You are not in a voice channel!")
+		}
+		var connection = await message.member.voice.channel.join();
+		var dispatcher;
+		if (!validURL(args[0])) {
+			await message.guild.me.voice.channel.leave()
+			return message.reply('Please use a valid url.');
+		}
+		try {
+			dispatcher = connection.play(ytdl(args[0], { filter: 'audioonly' }));
+		}
+		catch (e) {
+			if (String(e) === "Error: Not a YouTube domain") {
+				dispatcher = connection.play(args[0]);
+			}
+			else {
+				await message.guild.me.voice.channel.leave()
+				return await message.reply("Error playing url, is it a valid audio source?")
+			}
+		}
+		voices.set(message.guild.id, dispatcher);
+		dispatcher.on('finish', () => {
+			voices.delete(message.guild.id);
+			dispatcher.destroy();
+			message.member.voice.channel.leave();
+		});
+		
+	} else if (command == 'volume') {
+		let isplaying = Boolean(voices.get(message.guild.id))
+		let volume = Boolean(Number(args[0]) / 100) || false;
+		if (!isplaying) {
+			return await message.reply("I am currently not playing music in your voice channel!")
+		}
+		else if (!volume || volume > 1 || volume < 0) {
+			return await message.reply("You did not provide a valid volume! (number between 1 and 100)")
+		}
+		else {
+			voices.get(message.guild.id).setVolume(volume)
+		}
+	} else if (command == `channelinfo`) {
+		const channel = message.mentions.channels.array()[0] || message.channel;
+		if (!channel) {
+			return message.reply('please enter a valid channel.');
+		}
+		var embed = new Discord.MessageEmbed()
+		.setColor(0xb000ff)
+		.setThumbnail(message.guild.iconURL())
+		.setTitle('Channel Info')
+		.addField('| Name', channel.type === 'dm' ? `<@${channel.recipient.username}>` : channel.name, true)
+		.addField('| ID', channel.id, true)
+		.addField('| Creation Date', channel.createdAt.toDateString(), true)
+		.addField('| NSFW', channel.nsfw ? 'Yes' : 'No', true)
+		.addField('| Category', channel.parent ? channel.parent.name : 'None', true)
+		.addField('| Type', channelTypes[channel.type], true)
+		.addField('| Topic', channel.topic || 'None', true);
+		message.channel.send(embed);
+		
+	} else if (command == 'react') {
+		await message.react(client.emojis.cache.get('726935952584605737'))
+		
+	} else if (command == 'eval') {
+		if (message.author.id == 482513687417061376 || message.author.id == 541015870072422410 || message.author.id == 487443883127472129) {
+			const clean = text => {
+				if (typeof(text) === "string")
+				return text.replace(/`/g, "`" + String.fromCharCode(8203)).replace(/@/g, "@" + String.fromCharCode(8203));
+				else
+				return text;
+			}
+			
+			try {
+				const code = args.join(" ");
+				let evaled = eval(code);
+				
+				if (typeof evaled !== "string")
+				evaled = require("util").inspect(evaled);
+				
+				message.channel.send(clean(evaled), {code:"xl"}).catch(err => message.channel.send(`\`ERROR\` \`\`\`xl\n${clean(err)}\n\`\`\``))
+			} catch (err) {
+				message.channel.send(`\`ERROR\` \`\`\`xl\n${clean(err)}\n\`\`\``);
+			}
+		}
+		else (
+			await message.channel.send("Lol no")
+			)
+		} else if (command == `roleinfo`) {
+			const role = message.mentions.roles.first();
+			
+			if (!role) {
+				return message.reply('please enter a valid role.');
+			}
+			var permissions = [];
+			for (var i = 0; i < role.permissions.toArray().length; i++) {
+				permissions.push("`" + capitalize(role.permissions.toArray()[i].replace(/_/g, " ")) + "`");
+			}
+			var embed = new Discord.MessageEmbed()
+			.setColor(0xb000ff)
+			.setThumbnail(message.guild.iconURL())
+			.setTitle('Role Info')
+			.addField('| Name', role.name, true)
+			.addField('| ID', role.id, true)
+			.addField('| Creation Date', role.createdAt.toDateString(), true)
+			.addField('| Hoisted', role.hoist ? 'Yes' : 'No', true)
+			.addField('| Mentionable', role.mentionable ? 'Yes' : 'No', true)
+			.addField('| Permissions', permissions.join('\n') || 'None');
+			message.channel.send(embed);
+			
+			
+		} else if (command == 'serverinfo') {
+			let bots = 0;
+			for (var i = 0; i < message.guild.members.cache.array().length; i++) {
+				if (message.guild.members.cache.array()[i].user.bot) bots++
+			}
+			var embed = new Discord.MessageEmbed()
+			.setColor(0xb000ff)    
+			.setTitle('Server info:')
+			.setThumbnail(message.guild.iconURL())
+			.addField('| Server owner', message.guild.owner, true)
+			.addField('| Server name', message.guild.name, true)
+			.addField('| Server creation date', new Date(message.guild.createdTimestamp), true)
+			.addField('| Server region', capitalize(message.guild.region), true)
+			.addField('| Partnered', message.guild.partnered ? 'Yes' : 'No', true)
+			.addField(`| Date you joined`, message.member.joinedAt, true)
+			.addField('| Member count',message.guild.memberCount, true)
+			.addField('| Bot count',bots, true)
+			.addField('| Roles count', message.guild.roles.cache.array().length, true)
+			.addField('| channel count', message.guild.channels.cache.array().length, true)
+			.addField('| Emote count', message.guild.emojis.cache.array().length, true)
+			.addField('| Server boosts', message.guild.premiumSubscriptionCount, true)
+			.addField('| Boost tier', message.guild.premiumTier, true)
+			await message.channel.send(embed);
+		} else if (command == 'userinfo') {
+			var boosted = "No";
+			if (message.member.premiumSince !== null) boosted = "Yes"
+			var embed = new Discord.MessageEmbed()
+			.setColor(0xb000ff)    
+			.setTitle('User info:')
+			.setAuthor(message.author.tag)
+			.setThumbnail(message.author.displayAvatarURL())
+			.addField('| Username#tag', message.author.tag, true)
+			.addField('| ID', message.author.id, true)
+			.addField('| Boosted the server', boosted, true)
+			if (message.member.premiumSince !== null) {
+				months = Math.floor((new Date() - message.member.premiumSince) / 1000 / 60 / 60 / 24 / 30);
+				days = Math.floor((new Date() - message.member.premiumSince) / 1000 / 60 / 60 / 24) - (months * 30);
+				embed = embed.addField('| Time boosted', Math.floor(days) + " days").setFooter("Warning, this might be a bit off because it considers a month 30 days.")
+			}
+			let permissions = [];
+			for (var i = 0; i < message.member.permissions.toArray().length; i++) {
+				permissions.push("`" + capitalize(message.member.permissions.toArray()[i].replace(/_/g, " ")) + "`");
+			}
+			embed
+			.addField('| User permissions', permissions, true)
+			.addField('| Account creation date', new Date(message.author.createdTimestamp), true)
+			.addField('| Join date', message.member.joinedAt, true)
+			await message.channel.send(embed);
+			
+		} else if(command == 'bubbleplastic') {
+			var embed = new Discord.MessageEmbed()
+			.setColor(0xb000ff)
+			.setTitle('pop bubbleplastics!!')
+			.setDescription('\n||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||\n||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||\n||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||\n||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||\n||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||\n||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||\n||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||\n||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||\n||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||\n||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||\n||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||\n||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||\n||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||\n||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||\n||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||\n||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||\n||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||\n||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||||pop!||')
+			await message.channel.send(embed);
+			
+		} else if (command == 'servers') {
+			var embed = new Discord.MessageEmbed()
+			.setTitle('All Wolves Of Mars servers:')
+			.setDescription('Wolves Of Mars Lounge: https://discord.gg/AJxtuxg \nWolves Of Mars Destiny: https://discord.gg/GKVjnng \nWolves Of Mars Call Of Duty: https://discord.gg/afVaAwx \nWolves Of Mars Test Server: https://discord.gg/fXfPgwT \nWolves Of Mars Template: https://discord.gg/cAbnxxq')
+			.setColor(0xb000ff)
+			await message.channel.send(embed);
+			
+		} else if (command == 'emotes') {
+			var embed = new Discord.MessageEmbed()
+			.setTitle(`${message.guild.name} emotes:`)
+			.setDescription(`${message.guild.emojis.cache.array().join(" ")}`)
+			.setColor(0xb000ff)
+			try {
+				await message.channel.send(embed);
+			}
+			catch {
+				await message.reply("Cannot send message, are there too many emojis?")
+			}
+			
+		} else if (command == 'vote') {
+			var embed = new Discord.MessageEmbed()
+			.setTitle('Upvote links to top.gg')
+			.setDescription('Wolves Of Mars Lounge: https://top.gg/servers/689260593080696833/vote \nDummiBot: comming soon')
+			.setColor(0xb000ff)
+			await message.channel.send(embed);
+			
+		} else if (command == `flipcoin`) {
+			let random = (Math.floor(Math.random() * Math.floor(2)));
+			
+			if(random === 0) {
+				message.channel.send('I flipped heads!');
+			}
+			else {
+				message.channel.send('I flipped tails!');
+			} 
+			
+		} else if (command == `rps`) {
+			var embed = new Discord.MessageEmbed()
+			.setTitle(`Rock, Paper or Scissors`)
+			.setDescription(`<@${message.author.id}> How to play: \`${prefix}rps <rock|paper|scissors>\``)
+			.setImage('https://media1.tenor.com/images/8b20c9c09b08ad7e9d908eba2be5031d/tenor.gif?itemid=12484431')
+			.setColor(0xb000ff)
+			const acceptedReplies = ['rock', 'paper', 'scissors'];
+			const random = Math.floor((Math.random() * acceptedReplies.length));
+			const result = acceptedReplies[random];
+			
+			const choice = args[0];
+			if (!choice) return message.channel.send(embed);
+			if (!acceptedReplies.includes(choice)) return message.channel.send(`Only these responses are accepted: \`${acceptedReplies.join(', ')}\``);
+			
+			console.log('Bot Result:', result);
+			if (result === choice) return message.reply("It's a tie! We had the same choice.");
+			
+			switch (choice) {
+				case 'rock': {
+					if (result === 'paper') return message.reply('I chose paper, You lost!');
+					else return message.reply('I chose scissors, You won!');
+				}
+				case 'paper': {
+					if (result === 'scissors') return message.reply('I chose scissors, You lost!');
+					else return message.reply('I chose rock, You won!');        
+				}
+				case 'scissors': {
+					if (result === 'rock') return message.reply('I chose rock,You lost!');
+					else return message.reply('I chose paper, You won!');
+				}
+				default: {
+					return message.channel.send(`Only these responses are accepted: \`${acceptedReplies.join(', ')}\``);
+				}
+			}
+		}
+	});
+	
+	client.login('NzQxOTQwMTQ5NjMzNjc5Mzkw.Xy-3nA.eglMMTAbi56VR0-uH8QUKmY0i1U');
