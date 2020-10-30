@@ -1,3 +1,4 @@
+require('dotenv').config()
 delete require.cache;
 const Discord = require('discord.js');
 const fs = require('fs');
@@ -178,4 +179,4 @@ process.on("unhandledRejection", async (e) => {
 	client.channels.cache.get("770688583848689714").send(`\`\`\`js\n${e.stack}\`\`\``)
 })
 
-client.login('NzQxOTQwMTQ5NjMzNjc5Mzkw.Xy-3nA.eglMMTAbi56VR0-uH8QUKmY0i1U');
+client.login(process.env.TOKEN);
