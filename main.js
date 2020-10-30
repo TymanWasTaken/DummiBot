@@ -1,4 +1,3 @@
-require('dotenv').config()
 delete require.cache;
 const Discord = require('discord.js');
 const fs = require('fs');
@@ -99,9 +98,10 @@ client.on('ready', async message => {
 	.setColor(0xb000ff)
 	.setImage('https://media1.tenor.com/images/7dd18147740f05e106d30b35a24f6ffc/tenor.gif?itemid=11063213')
 	await channel.send(embed).catch(e => console.log(e));
+		
 	uptime = getUptime().noSecUptime;
 	
-	let m = await channel.send(`Currently been online for ${uptime} since my last restart\n\nIf you don't see this message update every minute it means I'm offline!`).catch(e => console.log(e));
+	let m = await channel.send(`<@${771779575570628609}> Currently been online for ${uptime} since my last restart\n\nIf you don't see this message update every minute it means I'm offline!`).catch(e => console.log(e));
 	setInterval(async function(){
 		uptime = getUptime().noSecUptime;
 		await m.edit(`Currently been online for ${uptime} since my last restart. \n\nIf you don't see this message update every minute it means I'm offline!`);
@@ -178,5 +178,5 @@ client.on('message', async message => {
 process.on("unhandledRejection", async (e) => {
 	client.channels.cache.get("770688583848689714").send(`\`\`\`js\n${e.stack}\`\`\``)
 })
-
-client.login(process.env.TOKEN);
+const token = fs.readFileSync("token.txt")
+client.login(token);
