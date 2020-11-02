@@ -1,3 +1,4 @@
+const {randColor} = require("../funcs.js")
 function capitalize(name) {
 	name = name.toLowerCase();
 	return name.charAt(0).toUpperCase() + name.slice(1)
@@ -5,7 +6,8 @@ function capitalize(name) {
 Discord = require("discord.js")
 module.exports = {
 	name: 'roleinfo',
-	description: 'role info',
+	category: 'info',
+	description: 'Get info general about mentioned role.',
 	async execute(message, args) {
 const role = message.mentions.roles.first();
 			
@@ -17,7 +19,7 @@ const role = message.mentions.roles.first();
 				permissions.push("`" + capitalize(role.permissions.toArray()[i].replace(/_/g, " ")) + "`");
 			}
 			var embed = new Discord.MessageEmbed()
-			.setColor(0xb000ff)
+			.setColor(randColor())
 			.setThumbnail(message.guild.iconURL())
 			.setTitle('Role Info')
 			.addField('| Name', role.name, true)

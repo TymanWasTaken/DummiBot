@@ -1,5 +1,6 @@
 module.exports = {
 	name: 'eval',
+	category: 'bot maker',
 	description: 'Runs JavaScript code',
 	check(message) {
 		return message.author.id == 482513687417061376 || message.author.id == 541015870072422410 || message.author.id == 487443883127472129

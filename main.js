@@ -44,6 +44,14 @@ function getPrefix(message) {
 	}
 	return p
 }
+function getReations(message) {
+	var data = fs.readFileSync("data.json");
+	const json = JSON.parse(data); 
+	if (json.noReactions.includes(message.guild.id)) {
+		return false
+	}
+	return true
+}
 //  _____   _    _   __     __   __     __   _   ______    ______   _______ 
 // |  _  \ | |  | | |  \   /  | |  \   /  | |_| |  __  \  /  __  \ |__   __|
 // | | | | | |  | | | | \_/ | | | | \_/ | |  _  | |__|  | | |  | |    | |   
@@ -98,17 +106,16 @@ client.on('ready', async message => {
 	.setColor(0xb000ff)
 	.setImage('https://media1.tenor.com/images/7dd18147740f05e106d30b35a24f6ffc/tenor.gif?itemid=11063213')
 	await channel.send(embed).catch(e => console.log(e));
-		
-	uptime = getUptime().noSecUptime;
 	
-	let m = await channel.send(`<@${771779575570628609}> Currently been online for ${uptime} since my last restart\n\nIf you don't see this message update every minute it means I'm offline!`).catch(e => console.log(e));
+	uptime = getUptime().noSecUptime;
+	let m = await channel.send(`Currently been online for ${uptime} since my last restart\n\nIf you don't see this message update every minute it means I'm offline!`).catch(e => console.log(e));
 	setInterval(async function(){
 		uptime = getUptime().noSecUptime;
 		await m.edit(`Currently been online for ${uptime} since my last restart. \n\nIf you don't see this message update every minute it means I'm offline!`);
 	}, 60000)
-	client.user.setPresence({ activity: { type: "WATCHING", name: `${client.guilds.cache.size} servers, run ~help for help` }})
+	client.user.setPresence({ activity: { type: "WATCHING", name: `${client.guilds.cache.size} servers, run @DummiBot, get server prefix` }})
 	setInterval(async function(){
-		client.user.setPresence({ activity: { type: "WATCHING", name: `${client.guilds.cache.size} servers, run ~help for help` }})
+		client.user.setPresence({ activity: { type: "WATCHING", name: `${client.guilds.cache.size} servers, run @DummiBot, get server prefix` }})
 	}, 60000)
 	const suggestionsChannel = client.channels.cache.get('770992516186374174')
 	let suggestions = await suggestionsChannel.messages.fetch()
@@ -124,9 +131,9 @@ client.on('message', async message => {
 	if (message.author.bot) return;
 	if (message.content.startsWith(`<@${client.user.id}>`) || message.content.startsWith(`<@!${client.user.id}>`)) {
 		let embed = new Discord.MessageEmbed()
-			.setTitle('This servers prefix:')
-			.setDescription(`${getPrefix(message)}`)
-			.setColor(0xb000ff)
+		.setTitle('This servers prefix:')
+		.setDescription(`${getPrefix(message)}`)
+		.setColor(0xb000ff)
 		await message.channel.send(embed)
 	}
 	if (message.author.bot) return;
@@ -136,7 +143,7 @@ client.on('message', async message => {
 		message.react('\u274c')
 		return;
 	} 
-	if (Math.random() < 0.1){ 
+	if (getReations(message) === true && Math.random() < 0.1){ 
 		number = 5;
 		message.react(message.guild.emojis.cache.get(message.guild.emojis.cache.randomKey()));
 	}
@@ -166,7 +173,7 @@ client.on('message', async message => {
 		} 
 	}
 	client.commands.get(command).execute(message, args).catch(async e => {
-		let m = await message.reply('there was an error trying to execute that command! please join the support server with the `~link` command\n```DummiBot just received a big update, one of them being, every command having their own file instead of one big one. Keep in mind that all functions still need to get added. If you see this messsage it means this function hasn\'t been added yet\n\nThese errors do get reported in the support server! So they will get fixed!```');
+		let m = await message.reply('there was an error trying to execute that command! please join the support server with the `~link` command');
 		client.channels.cache.get("770688583848689714").send(`\`\`\`js\n${e.stack}\`\`\``)
 		await sleep(60000)
 		await m.delete()
@@ -178,5 +185,5 @@ client.on('message', async message => {
 process.on("unhandledRejection", async (e) => {
 	client.channels.cache.get("770688583848689714").send(`\`\`\`js\n${e.stack}\`\`\``)
 })
-const token = fs.readFileSync("token.txt")
+const token = fs.readFileSync("token.txt").toString()
 client.login(token);

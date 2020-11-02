@@ -2,6 +2,7 @@ const got = require("got")
 const fs = require("fs")
 module.exports = {
 	name: 'haste',
+	category: 'bot maker',
 	description: 'Uploads code to hastebin',
 	check(message) {
 		return message.author.id == 482513687417061376 || message.author.id == 541015870072422410 || message.author.id == 487443883127472129

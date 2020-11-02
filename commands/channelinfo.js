@@ -1,3 +1,4 @@
+const {randColor} = require("../funcs.js")
 const channelTypes = {
 	dm: 'DM',
 	group: 'Group DM',
@@ -13,14 +14,15 @@ function capitalize(name) {
 Discord = require("discord.js")
 module.exports = {
 	name: 'channelinfo',
-	description: 'Shows the information of a channel',
+	category: 'info',
+	description: `Get general info for this or a channel.\nUse ~channelinfo [channel mention] if you want to see info about a different channel.`,
 	async execute(message, args) {
 		const channel = message.mentions.channels.array()[0] || message.channel;
 		if (!channel) {
 			return message.reply('please enter a valid channel.');
 		}
 		var embed = new Discord.MessageEmbed()
-		.setColor(0xb000ff)
+		.setColor(randColor())
 		.setThumbnail(message.guild.iconURL())
 		.setTitle('Channel Info')
 		.addField('| Name', channel.type === 'dm' ? `<@${channel.recipient.username}>` : channel.name, true)

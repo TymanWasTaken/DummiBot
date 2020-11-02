@@ -1,3 +1,4 @@
+const {randColor} = require("../funcs.js")
 const randomImages = [
 	'https://media1.tenor.com/images/b93a212c42e0630c534d90c386b221f3/tenor.gif?itemid=16358959',
 	'https://media1.tenor.com/images/a01f77ceac702de9352ebfe96db19642/tenor.gif?itemid=14349965',
@@ -9,13 +10,14 @@ const randomImages = [
 Discord = require("discord.js")
 module.exports = {
 	name: 'hello',
-	description: 'SW meme',
+	category: 'actions',
+	description: 'Say hello.',
 	async execute(message, args) {
 		const randomImage = randomImages[Math.floor(Math.random() * randomImages.length)];
 var embed = new Discord.MessageEmbed()
 		.setDescription(`hello there, general <@${message.author.id}>`)
 		.setImage(randomImage)
-		.setColor(0xb000ff)
+		.setColor(randColor())
         await message.channel.send(embed);
     },
 };

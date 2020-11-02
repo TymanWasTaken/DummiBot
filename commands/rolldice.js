@@ -4,6 +4,7 @@ function sleep(ms) {
 Discord = require("discord.js")
 module.exports = {
 	name: 'rolldice',
+	category: 'fun',
 	description: 'roll a dice',
 	async execute(message, args) {
         const rollDice = () => Math.floor(Math.random() * 6) + 1;

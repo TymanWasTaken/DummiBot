@@ -1,3 +1,4 @@
+const {randColor} = require("../funcs.js")
 const randomImages = [ 
     'https://media1.tenor.com/images/108c2257683620292f4687262f26e872/tenor.gif?itemid=17258498',
     'https://media1.tenor.com/images/2d4138c7c24d21b9d17f66a54ee7ea03/tenor.gif?itemid=12535134',
@@ -10,8 +11,9 @@ const randomImages = [
 ]
 Discord = require("discord.js")
 module.exports = {
-	name: 'hug',
-	description: 'hug someone',
+    name: 'hug',
+    category: 'actions',
+	description: 'Hug someone.',
 	async execute(message, args) {
         if (message.mentions.users.array([0])[0] === message.author.user) return message.channel.send("Are you this lonely?")
         if (message.mentions.users.array([0])[0] === message.client.user) return message.channel.send("I'll hug you back!")
@@ -20,7 +22,7 @@ module.exports = {
 	var embed = new Discord.MessageEmbed()
     .setDescription(`<@${message.author.id}> hugs ${args[0]}!!`)
     .setImage(randomImage)
-    .setColor(0xb000ff)
+    .setColor(randColor())
     await message.channel.send(embed);
     },
 };

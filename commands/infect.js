@@ -4,7 +4,8 @@ function sleep(ms) {
 Discord = require("discord.js")
         module.exports = {
             name: 'infect',
-            description: 'infect someone',
+            category: 'fun',
+            description: 'Infect someone with a virus.',
             async execute(message, args) {
                 if (message.mentions.users.array([0])[0] === message.client.user) return message.channel.send("I'm the virus... you really think I can infect myself?")
 		if (args[0] === undefined) return message.channel.send("You must specify a user")

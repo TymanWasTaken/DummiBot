@@ -1,6 +1,7 @@
 module.exports = {
 	name: 'react',
-	description: 'react random server emotes to your last message! (usefull for announcements!)',
+	category: 'utility',
+	description: 'React random server emotes to your last message!',
 	async execute(message, args) {
 		if (!args[0]) return await message.reply("Please specify a number of reactions to add")
 		if (Number(args[0]) > 20 || Number(args[0]) < 1) return await message.reply("Please specify a number between 1 and 20")
@@ -26,8 +27,9 @@ module.exports = {
 				await m.react(emojis.array()[i]);
 			}
 		}
-		catch (error){
-			return message.channel.send(error)
+		catch (error) {
+			// console.error(error)
+			return
 		}
 		
 	},

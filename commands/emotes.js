@@ -1,17 +1,21 @@
+const {randColor} = require("../funcs.js")
+const paginationEmbed = require("discord.js-pagination")
 Discord = require("discord.js")
 module.exports = {
 	name: 'emotes',
+	category: 'info',
 	description: 'Show the emotes of the guild',
 	async execute(message, args) {
-		var embed = new Discord.MessageEmbed()
-			.setTitle(`${message.guild.name} emotes:`)
-			.setDescription(`${message.guild.emojis.cache.array().join(" ")}`)
-			.setColor(0xb000ff)
-			try {
-				await message.channel.send(embed);
-			}
-			catch {
-				await message.reply("Cannot send message, are there too many emojis?")
-			}
+		let emojiArray = [];
+		let emojis = message.guild.emojis.cache.array();
+		let embeds = [];
+		while (emojis.length > 0) emojiArray.push(emojis.splice(0, 15));
+		for (let i = 0; i < emojiArray.length; i++) {
+			embeds[i] = new Discord.MessageEmbed()
+			.setTitle(`Emojis:`)
+			.setDescription(emojiArray[i].join("\n") + "\n\n\nThe emotes are time of adding based (not name)")
+			.setColor(randColor())
+		}
+		paginationEmbed(message, embeds, ["◀", "▶"])
 	},
 };

@@ -1,3 +1,4 @@
+const {randColor} = require("../funcs.js")
 function capitalize(name) {
 	name = name.toLowerCase();
 	return name.charAt(0).toUpperCase() + name.slice(1)
@@ -5,14 +6,15 @@ function capitalize(name) {
 Discord = require("discord.js")
 module.exports = {
 	name: 'serverinfo',
-	description: 'server info',
+	category: 'info',
+	description: 'Get general info of this server.',
 	async execute(message, args) {
 let bots = 0;
 for (var i = 0; i < message.guild.members.cache.array().length; i++) {
     if (message.guild.members.cache.array()[i].user.bot) bots++
 }
 var embed = new Discord.MessageEmbed()
-.setColor(0xb000ff)    
+.setColor(randColor())    
 .setTitle('Server info:')
 .setThumbnail(message.guild.iconURL())
 .addField('| Server owner', message.guild.owner, true)

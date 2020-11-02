@@ -3,7 +3,8 @@ function sleep(ms) {
 }
 module.exports = {
 	name: 'money',
-	description: 'install virus',
+	category: 'fun',
+	description: 'Get free money.',
 	async execute(message, args) {
 var m = await message.channel.send(`<@${message.author.id}> do you want free money? click the emote below!`)
 		await m.react(message.client.emojis.cache.get('726935952584605737'))

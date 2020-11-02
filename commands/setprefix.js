@@ -1,6 +1,7 @@
 const fs = require("fs")
 module.exports = {
 	name: 'setprefix',
+	category: 'admin',
 	description: 'Sets the prefix for the current server, must have manage server permission',
 	check(message) {
 		return message.member.hasPermission("MANAGE_GUILD")

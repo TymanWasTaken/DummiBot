@@ -1,8 +1,10 @@
+const {randColor} = require("../funcs.js")
 const got = require("got")
 Discord = require("discord.js")
 module.exports = {
 	name: 'docs',
 	description: 'Gets methods for a class',
+	category: 'utility',
 	async execute(message, args) {
 		got.get('https://raw.githubusercontent.com/discordjs/discord.js/docs/stable.json').then(async response => {
 		const body = JSON.parse(response.body)
@@ -23,6 +25,7 @@ module.exports = {
 				.setTitle(c.name)
 				.setDescription(`${c.description.replace("<warn>","```").replace("</warn>","```")}\n\n[Docs link](http://discord.js.org/#/docs/main/stable/class/${c.name})`)
 				.setFooter("For this class either there was not a single method or there wan not a single property. This caused me to exclude both, because if it didn't it would make the programers' life much harder.")
+				.setColor(randColor())
 				return message.channel.send(embed)
 			}
 			let props = "";
@@ -38,6 +41,7 @@ module.exports = {
 			.setDescription(`${c.description.replace("<warn>","```").replace("</warn>","```")}\n\n[Docs link](http://discord.js.org/#/docs/main/stable/class/${c.name})`)
 			.addField("| Properties", props, true)
 			.addField("| Methods", meths, true)
+			.setColor(randColor())
 			return message.channel.send(embed).catch(e => {
 				let propsSlim = "";
 				c.props.forEach(e => {
@@ -53,11 +57,13 @@ module.exports = {
 				.addField("| Properties", props, true)
 				.addField("| Methods", meths, true)
 				.setFooter("This response was minified to get around the discord character limit")
+				.setColor(randColor())
 				message.channel.send(embedSlim).catch(e => {
 					let embedSuperSlim = new Discord.MessageEmbed()
 					.setTitle(c.name)
 					.setDescription(`${c.description.replace("<warn>","```").replace("</warn>","```")}\n\n[Docs link](http://discord.js.org/#/docs/main/stable/class/${c.name})`)
 					.setFooter("This response was super minified to get around the discord character limit")
+					.setColor(randColor())
 					message.channel.send(embedSuperSlim)
 				})
 			})
