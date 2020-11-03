@@ -1,13 +1,13 @@
 # DummiBot
-##Commands
+## Commands
 
-###General commands
+### General commands
 
 ~help : get help menu
 ~ping : get bot latency
 ~stats : get server stats
 
-###Info commands
+### Info commands
 
 ~link : get support server/ my server link
 ~invite : get bot invite link
@@ -15,7 +15,7 @@
 ~channelinfo : get the info of a mentioned channel or the current channel
 ~userinfo : get the info of a mentioned user, or your info
 
-###Fun commands
+### Fun commands
 
 ~yeet : yeet someone
 ~hello : say hi to the bot
