@@ -6,18 +6,12 @@ module.exports = {
 	aliases: ['av'],
 	description: 'Get your avatar.\nUse ~avatar [user mention] to get their avatar.',
 	async execute(message, args) {
-		var url
-		if (message.mentions.users.array()[0] === undefined) {
-			url = message.author.displayAvatarURL()
-		}
-		else {
-			url = message.mentions.users.array()[0].displayAvatarURL()
-		}
+		let user = message.mentions.users.first() || message.author
 		var embed = new Discord.MessageEmbed()
 		.setDescription(`${args[0] || message.author.tag}'s avatar:`)
 		.setColor(randColor())
-		.setURL(url)
-		.setImage(url);
+		.setURL(user.displayAvatarURL())
+		.setImage(user.displayAvatarURL());
 		await message.channel.send(embed);
 	},
 };

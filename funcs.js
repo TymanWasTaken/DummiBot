@@ -38,12 +38,12 @@ module.exports = {
         return !!pattern.test(str);
     },
     getReations(message) {
-        var data = fs.readFileSync("data.json");
+        var data = fs.readFileSync("data.json").toString();
         const json = JSON.parse(data); 
-        if (json.noReactions.includes(message.guild.id)) {
-            return false
+        if (json.reactions.includes(message.guild.id)) {
+            return true
         }
-        return true
+        return false
     },
     // const {paginate} = require("../funcs.js")
     async paginate(message, embeds) {

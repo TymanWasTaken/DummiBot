@@ -26,10 +26,14 @@ module.exports = {
         .setThumbnail(message.guild.iconURL())
         .addField('| Server name', message.guild.name, true)
         .addField('| This server\'s prefix', `\`${getPrefix(message)}\``, true)
-        .addField('| Random reactions', getReactions(message) ? 'enabled' : 'disabled', true ) 
+        .addField('| Random reactions', getReactions(message) ? 'Enabled' : 'Disabled', true ) 
+        // .addField('| Moderation role(s)', , true)
+        // .addField('| Administrator role(s)', , true )
+        // .addField('| Enabled modules', , true)
+        // .addField('| Disabled modules', , true)
         .addField('| Bot nickname', message.guild.me.nickname || "DummiBot", true)
         .addField(`| Date bot joined`, message.member.joinedAt, true)
-        //.addField('| Bot permissions', permissions, true)
+        .addField('| Bot permissions', permissions, true)
         await message.channel.send(embed);
     },
 };

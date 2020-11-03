@@ -16,7 +16,7 @@ module.exports = {
 var embed = new Discord.MessageEmbed()
 		.setDescription(`<@${message.author.id}> cries...`)
 		.setImage(randomImage)
-		.setColor(randColor())
+		.setColor(randColor)
         await message.channel.send(embed);
     },
 };

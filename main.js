@@ -47,10 +47,10 @@ function getPrefix(message) {
 function getReations(message) {
 	var data = fs.readFileSync("data.json");
 	const json = JSON.parse(data); 
-	if (json.noReactions.includes(message.guild.id)) {
-		return false
+	if (json.reactions.includes(message.guild.id)) {
+		return true
 	}
-	return true
+	return false
 }
 //  _____   _    _   __     __   __     __   _   ______    ______   _______ 
 // |  _  \ | |  | | |  \   /  | |  \   /  | |_| |  __  \  /  __  \ |__   __|

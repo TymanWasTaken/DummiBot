@@ -15,7 +15,7 @@ module.exports = {
 	async execute(message, args) {
 		const randomImage = randomImages[Math.floor(Math.random() * randomImages.length)];
 var embed = new Discord.MessageEmbed()
-		.setDescription(`hello there, general <@${message.author.id}>`)
+		.setDescription(`<@${message.author.id}> says hello!`)
 		.setImage(randomImage)
 		.setColor(randColor())
         await message.channel.send(embed);

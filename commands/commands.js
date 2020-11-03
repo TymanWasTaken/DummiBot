@@ -4,7 +4,7 @@ const names = {
 	'help': 'Help commands',
 	'info': 'Information commands',
 	'music': 'Music commands',
-	'utility': "Uitlity commands",
+	'utility': "Utility commands",
 	'bot maker': "Developer commands",
 	'fun': 'Fun commands',
 	'emotion': 'Emotion commands',
@@ -12,6 +12,19 @@ const names = {
 	'support': 'Support commands',
 	'moderation': 'Moderation commands',
 	'admin': "Admin commands"
+}
+const nameWeight = {
+	'fun': 0,
+	'emotions': 1,
+	'actions': 2,
+	'info': 3,
+	'music': 4,
+	'utility': 5,
+	'moderation': 6,
+	'admin': 7,
+	'help': 8,
+	'support': 9,
+	'bot maker': 10,
 }
 module.exports = {
 	name: 'commands',
@@ -22,12 +35,6 @@ module.exports = {
 		let embeds = [];
 		let runnableCommands = [];
 		message.client.commands.forEach(e => {
-			// if (e.check !== undefined && e.check(message)) {
-			// 	desc = desc + `**${e.name}**: ${e.description}\n`
-			// }
-			// else if (e.check === undefined) {
-			// 	desc = desc + `**${e.name}**: ${e.description}\n`
-			// }
 			if (!categories.includes(e.category)) {
 				categories.push(e.category)
 			}
@@ -40,6 +47,9 @@ module.exports = {
 				runnableCommands.push(e)
 			}
 		});
+		categories = categories.sort((a, b) => {
+			return nameWeight[a] - nameWeight[b];
+		})
 		let niceCategories = "";
 		const color = randColor()
 		for (let i = 0; i < categories.length; i++) {
@@ -52,13 +62,15 @@ module.exports = {
 				embeds[i].addField(item.name, item.description, true)
 			}
 		}
-		embeds.forEach(e => {
-			if (e.fields.length === 0) {
-				embeds.splice(embeds.indexOf(e), 1);
+		for (const e of embeds) {
+			if (e.fields.length == 0) {
+				let i = embeds.indexOf(e)
+				embeds.splice(i, 1);
 			}
-		});
-		embeds.forEach(e => {
-			niceCategories = niceCategories + `${e.title}\n\n`
+		}
+		niceCategories = niceCategories + "**Page 1:** Categories list\n\n"
+		embeds.forEach((e, i) => {
+			niceCategories = niceCategories + `**Page ${i+2}:** ${e.title}\n\n`
 		});
 		let firstEmbed = new Discord.MessageEmbed() 
 		.setTitle("Command categories")
